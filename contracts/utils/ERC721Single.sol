@@ -18,7 +18,7 @@ contract ERC721Single is Context, ERC165, IERC721, IERC721Metadata {
     using Address for address;
     using Strings for uint256;
 
-    uint256 constant private TOKEN_ID = 1;
+    uint256 constant internal TOKEN_ID = 1;
 
     // Token name
     string private _name;
@@ -168,8 +168,7 @@ contract ERC721Single is Context, ERC165, IERC721, IERC721Metadata {
         bytes memory data
     ) public virtual override {
         require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: caller is not token owner or approved");
-        _transfer(from, to, tokenId);
-        require(_checkOnERC721Received(from, to, tokenId, data), "ERC721: transfer to non ERC721Receiver implementer");
+        _safeTransfer(from, to, tokenId, data);
     }
 
     /**
@@ -209,6 +208,26 @@ contract ERC721Single is Context, ERC165, IERC721, IERC721Metadata {
 
         _owner = to;
         emit Transfer(from, to, tokenId);
+    }
+
+    /**
+     * @dev Safely transfers `tokenId` from `from` to `to`. If `to` is a contract,
+     *  it must implement {IERC721Receiver-onERC721Received}.
+     *
+     *  As opposed to {safeTransferFrom}, this imposes no restrictions on msg.sender.
+     */
+    function _safeTransfer(
+        address from,
+        address to,
+        uint256 tokenId,
+        bytes memory data
+    ) internal virtual {
+        _transfer(from, to, tokenId);
+        require(_checkOnERC721Received(from, to, tokenId, data), "ERC721: transfer to non ERC721Receiver implementer");
+    }
+
+    function _setTokenURI(string memory uri) internal {
+        _tokenURI = uri;
     }
 
     /**
