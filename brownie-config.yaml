@@ -1,0 +1,8 @@
+dependencies:
+  - OpenZeppelin/openzeppelin-contracts@4.8.3
+
+compiler:
+  solc:
+    version: 0.8.19
+    remappings:
+      - '@openzeppelin/contracts=OpenZeppelin/openzeppelin-contracts@4.8.3/contracts'
