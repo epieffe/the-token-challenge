@@ -72,4 +72,8 @@ contract TokenChallenge is ERC721Single, ERC2981Global, Ownable, IERC721Receiver
         Address.sendValue(payable(winner), address(this).balance);
         return this.onERC721Received.selector;
     }
+
+    function setRoyalty(address receiver, uint96 royaltyFraction) external virtual onlyOwner {
+        _setRoyalty(receiver, royaltyFraction);
+    }
 }
