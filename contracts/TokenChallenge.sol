@@ -23,15 +23,15 @@ contract TokenChallenge is ERC721Single, ERC2981Global, Ownable, IERC721Receiver
     string private constant SYMBOL = "THC";
     string private constant TOKEN_URI = "ipfs://bafkreiadflw5nc747gf2vxn6sw5kkit5mef7sn4agx6pdhfmn7c6ahlfmy";
 
-    address public keyTokenAddress;
-    uint256 public keyTokenId;
+    IERC721 public keyContract;
+    uint256 public keyId;
 
     constructor(
-        address keyAddress,
-        uint256 keyId
+        IERC721 _keyContract,
+        uint256 _keyId
     ) ERC721Single(NAME, SYMBOL, TOKEN_URI) {
-        keyTokenAddress = keyAddress;
-        keyTokenId = keyId;
+        keyContract = _keyContract;
+        keyId = _keyId;
         // Set token royalty to 10%
         _setRoyalty(_msgSender(), 1000);
     }
@@ -43,6 +43,15 @@ contract TokenChallenge is ERC721Single, ERC2981Global, Ownable, IERC721Receiver
         return
             ERC721Single.supportsInterface(interfaceId) ||
             ERC2981Global.supportsInterface(interfaceId);
+    }
+
+    /**
+     * Received Ether is used to pay the challenge winner.
+     * If Eher is received after the challenge is completed,
+     * then transaction is reverted.
+     */
+    receive() external payable {
+        require(ownerOf(TOKEN_ID) == address(this));
     }
 
     /**
@@ -58,7 +67,7 @@ contract TokenChallenge is ERC721Single, ERC2981Global, Ownable, IERC721Receiver
         bytes memory data
     ) external returns (bytes4) {
         require (
-            msg.sender == address(keyTokenAddress) && tokenId == keyTokenId,
+            msg.sender == address(keyContract) && tokenId == keyId,
             "received invalid token"
         );
         address winner;
