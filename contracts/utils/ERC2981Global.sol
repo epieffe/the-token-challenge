@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
-// Based on OpenZeppelin ERC721 implementation
+
+// Based on OpenZeppelin ERC2981 implementation
 
 pragma solidity ^0.8.0;
 
@@ -8,8 +9,7 @@ import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 
 /**
  * @dev Implementation of the NFT Royalty Standard, a standardized way to retrieve royalty payment information.
- * Royalty information is specified globally for all token ids.
- * Royalty is specified in basis points.
+ * Royalty information is specified globally for all token ids. Royalty is specified in basis points.
  *
  * IMPORTANT: ERC-2981 only specifies a way to signal royalty information and does not enforce its payment. See
  * https://eips.ethereum.org/EIPS/eip-2981#optional-royalty-payments[Rationale] in the EIP. Marketplaces are expected to
@@ -30,15 +30,19 @@ abstract contract ERC2981Global is IERC2981, ERC165 {
     }
 
     /**
-     * @inheritdoc IERC2981
+     * @notice Computes how much royalty is owed and to whom, based on a sale price.
+     * @dev Sale price may be denominated in any unit of exchange. The royalty amount
+     * should be paid in that same unit of exchange.
+     * @param tokenId Id of the selling token
+     * @param salePrice Sale price
      */
-    function royaltyInfo(uint256 _tokenId, uint256 _salePrice) public view virtual override returns (address, uint256) {
-        uint256 royaltyAmount = (_salePrice * _royaltyFraction) / FEE_DENOMINATOR;
+    function royaltyInfo(uint256 tokenId, uint256 salePrice) public view virtual override returns (address, uint256) {
+        uint256 royaltyAmount = (salePrice * _royaltyFraction) / FEE_DENOMINATOR;
         return (_receiver, royaltyAmount);
     }
 
     /**
-     * @dev Sets the royalty information that all ids in this contract will default to.
+     * @dev Sets the royalty information for all ids in this contract.
      *
      * Requirements:
      *

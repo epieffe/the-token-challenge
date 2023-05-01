@@ -20,11 +20,15 @@ contract ERC721Single is Context, ERC165, IERC721, IERC721Metadata {
 
     uint256 constant internal TOKEN_ID = 1;
 
-    // Token name
-    string private _name;
+    /**
+     * @notice The token collection name.
+     */
+    string public name;
 
-    // Token symbol
-    string private _symbol;
+    /**
+     * @notice The token collection symbol.
+     */
+    string public symbol;
 
     // Owner of the unique token
     address private _owner;
@@ -40,10 +44,10 @@ contract ERC721Single is Context, ERC165, IERC721, IERC721Metadata {
     /**
      * @dev Initializes the contract by setting a `name` and a `symbol` to the token collection.
      */
-    constructor(string memory name_, string memory symbol_, string memory tokenURI_) {
-        _name = name_;
-        _symbol = symbol_;
-        _tokenURI = tokenURI_;
+    constructor(string memory _name, string memory _symbol, string memory uri) {
+        name = _name;
+        symbol = _symbol;
+        _tokenURI = uri;
         _owner = address(this);
         emit Transfer(address(0), address(this), TOKEN_ID);
     }
@@ -59,6 +63,7 @@ contract ERC721Single is Context, ERC165, IERC721, IERC721Metadata {
     }
 
     /**
+     * @notice Retrieves the number of tokens in input account.
      * @dev See {IERC721-balanceOf}.
      */
     function balanceOf(address owner) public view virtual override returns (uint256) {
@@ -67,6 +72,7 @@ contract ERC721Single is Context, ERC165, IERC721, IERC721Metadata {
     }
 
     /**
+     * @notice Retrieves the owner of input token id.
      * @dev See {IERC721-ownerOf}.
      */
     function ownerOf(uint256 tokenId) public view virtual override returns (address) {
@@ -75,20 +81,7 @@ contract ERC721Single is Context, ERC165, IERC721, IERC721Metadata {
     }
 
     /**
-     * @dev See {IERC721Metadata-name}.
-     */
-    function name() public view virtual override returns (string memory) {
-        return _name;
-    }
-
-    /**
-     * @dev See {IERC721Metadata-symbol}.
-     */
-    function symbol() public view virtual override returns (string memory) {
-        return _symbol;
-    }
-
-    /**
+     * @notice Retrieves the metadata URI for input token id.
      * @dev See {IERC721Metadata-tokenURI}.
      */
     function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
@@ -97,7 +90,10 @@ contract ERC721Single is Context, ERC165, IERC721, IERC721Metadata {
     }
 
     /**
+     * @notice Gives permission to transfer a token to an account.
      * @dev See {IERC721-approve}.
+     * @param to Account to give permission
+     * @param tokenId Id of the token that `to` is allowed to transfer
      */
     function approve(address to, uint256 tokenId) public virtual override {
         _requireMinted(tokenId);
@@ -112,6 +108,7 @@ contract ERC721Single is Context, ERC165, IERC721, IERC721Metadata {
     }
 
     /**
+     * @notice Retrieves the account approved for input token id.
      * @dev See {IERC721-getApproved}.
      */
     function getApproved(uint256 tokenId) public view virtual override returns (address) {
@@ -120,7 +117,9 @@ contract ERC721Single is Context, ERC165, IERC721, IERC721Metadata {
     }
 
     /**
-     * @dev See {IERC721-setApprovalForAll}.
+     * @notice Approve or remove an account as an operator for the caller.
+     * @dev Operators can call {IERC721-transferFrom} or {IERC721-safeTransferFrom}
+     * for any token owned by the caller. See {IERC721-setApprovalForAll}.
      */
     function setApprovalForAll(address operator, bool approved) public virtual override {
         require(_msgSender() != operator, "ERC721: approve to caller");
@@ -129,6 +128,7 @@ contract ERC721Single is Context, ERC165, IERC721, IERC721Metadata {
     }
 
     /**
+     * @notice Checks if an operator is allowed to manage all of the assets of an account.
      * @dev See {IERC721-isApprovedForAll}.
      */
     function isApprovedForAll(address owner, address operator) public view virtual override returns (bool) {
@@ -136,7 +136,9 @@ contract ERC721Single is Context, ERC165, IERC721, IERC721Metadata {
     }
 
     /**
-     * @dev See {IERC721-transferFrom}.
+     * @notice Transfers a token from an account to an other.
+     * @dev The caller is responsible to confirm that the recipient is capable of receiving ERC721
+     * or else they may be permanently lost. See {IERC721-transferFrom}.
      */
     function transferFrom(
         address from,
@@ -148,7 +150,9 @@ contract ERC721Single is Context, ERC165, IERC721, IERC721Metadata {
     }
 
     /**
-     * @dev See {IERC721-safeTransferFrom}.
+     * @notice Safely transfers a token from an account to an other.
+     * @dev If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received},
+     * which is called upon a safe transfer. See {IERC721-safeTransferFrom}.
      */
     function safeTransferFrom(
         address from,
@@ -159,7 +163,13 @@ contract ERC721Single is Context, ERC165, IERC721, IERC721Metadata {
     }
 
     /**
-     * @dev See {IERC721-safeTransferFrom}.
+     * @notice Safely transfers a token from an account to an other.
+     * @dev If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received},
+     * which is called upon a safe transfer. See {IERC721-safeTransferFrom}.
+     * @param from The current owner of the NFT
+     * @param to The new owner
+     * @param tokenId The NFT to transfer
+     * @param data Additional data with no specified format, sent in call to `to`
      */
     function safeTransferFrom(
         address from,

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// Based on OpenZeppelin ERC721 implementation
+
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
@@ -12,10 +12,12 @@ import "./utils/ERC721Single.sol";
 import "./utils/ERC2981Global.sol";
 
 /**
- * @dev ERC721 token contract with one single token. This single token is locked
- * in the token contract itself and can only be unlocked by transfering a key token
- * to the token contract by calling {IERC721-safeTransferFrom}. The address that
- * unlocks the single token also withdraws all the token contract balance.
+ * @title Token Hacker Challenge
+ * @dev ERC721 token contract with one single token. The single token is locked in
+ * this contract and can only be unlocked by transfering a key token to this contract
+ * by calling {IERC721-safeTransferFrom}. The address that unlocks the single token
+ * also withdraws all the balance of this contract.
+ * @author epieffe.eth
  */
 contract TokenChallenge is ERC721Single, ERC2981Global, Ownable, IERC721Receiver {
 
@@ -23,7 +25,14 @@ contract TokenChallenge is ERC721Single, ERC2981Global, Ownable, IERC721Receiver
     string private constant SYMBOL = "THC";
     string private constant TOKEN_URI = "ipfs://bafkreiadflw5nc747gf2vxn6sw5kkit5mef7sn4agx6pdhfmn7c6ahlfmy";
 
+    /**
+     * @notice The key token contract.
+     */
     IERC721 public keyContract;
+
+    /**
+     * @notice The key token id.
+     */
     uint256 public keyId;
 
     constructor(
@@ -37,7 +46,9 @@ contract TokenChallenge is ERC721Single, ERC2981Global, Ownable, IERC721Receiver
     }
 
     /**
+     * @notice Detects what interfaces this contract implements.
      * @dev See {IERC165-supportsInterface}.
+     * @return true if this contract implements input interface
      */
     function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721Single, ERC2981Global) returns (bool) {
         return
@@ -46,19 +57,23 @@ contract TokenChallenge is ERC721Single, ERC2981Global, Ownable, IERC721Receiver
     }
 
     /**
-     * Received Ether is used to pay the challenge winner.
-     * If Eher is received after the challenge is completed,
-     * then transaction is reverted.
+     * @notice Received Ether is used to pay the challenge winner.
+     * @dev If Eher is received after the challenge is completed, then transaction is reverted.
      */
     receive() external payable {
         require(ownerOf(TOKEN_ID) == address(this));
     }
 
     /**
-     * This is called when an ERC721 token is transfered to this contract using {IERC721-safeTransferFrom}.
-     * If key token is received the challenge prize is unlocked, otherwise transaction is reverted.
-     * The address that receives the prize can be specified in `data`. If not specified the prize is
-     * sent to `operator`.
+     * @notice Pays challenge winner when key token is received.
+     * @dev This is called by the key token contract when the key token is transfered to this
+     * contract using {IERC721-safeTransferFrom}. If key token is received, the challenge prize
+     * is unlocked, otherwise transaction is reverted. The address to send the prize to can be
+     * specified in `data`. If not specified the prize is sent to `operator`.
+     * @param operator Address that performed the token transfer to this contract
+     * @param from Address from where the token was transfered
+     * @param tokenId Id of the received token
+     * @param data Byte encoded address to send the prize to. If empty prize is sent to operator
      */
     function onERC721Received(
         address operator,
@@ -82,6 +97,10 @@ contract TokenChallenge is ERC721Single, ERC2981Global, Ownable, IERC721Receiver
         return this.onERC721Received.selector;
     }
 
+    /**
+     * @notice Allows contract owner to update the royalty information.
+     * @dev Royalty is specified in basis points.
+     */
     function setRoyalty(address receiver, uint96 royaltyFraction) external virtual onlyOwner {
         _setRoyalty(receiver, royaltyFraction);
     }
