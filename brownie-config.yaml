@@ -4,5 +4,8 @@ dependencies:
 compiler:
   solc:
     version: 0.8.19
+    optimizer:
+      enabled: true
+      runs: 200
     remappings:
       - '@openzeppelin/contracts=OpenZeppelin/openzeppelin-contracts@4.8.3/contracts'
