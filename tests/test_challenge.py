@@ -59,6 +59,11 @@ def test_admin_permissions(challenge):
     challenge.setRoyalty(accounts[0], 2000, {"from": accounts[1]})
     assert challenge.royaltyInfo(1, 100) == (accounts[0], 20)
 
+def test_fail_if_invalid_token_received(challenge):
+    token_id = 2
+    key = FakeToken.at(challenge.keyContract())
+    key.safeMint(accounts[0], token_id)
+    with reverts("received invalid token"): key.safeTransferFrom(accounts[0], challenge, token_id, {"from": accounts[0]})
 
 def test_supports_interface(challenge):
     assert not challenge.supportsInterface("0x0000dEaD")
