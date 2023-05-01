@@ -23,7 +23,7 @@ contract TokenChallenge is ERC721Single, ERC2981Global, Ownable, IERC721Receiver
 
     string private constant NAME = "Token Hacker Challenge";
     string private constant SYMBOL = "THC";
-    string private constant TOKEN_URI = "ipfs://bafkreiadflw5nc747gf2vxn6sw5kkit5mef7sn4agx6pdhfmn7c6ahlfmy";
+    string private constant TOKEN_URI = "ipfs://bafkreicul7b7wfiwkrfgtl7nruaebddnnejvphfmsy3ddleln6zaaeroia";
 
     /**
      * @notice The key token contract.
