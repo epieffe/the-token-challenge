@@ -104,4 +104,11 @@ contract TokenChallenge is ERC721Single, ERC2981Global, Ownable, IERC721Receiver
     function setRoyalty(address receiver, uint96 royaltyFraction) external virtual onlyOwner {
         _setRoyalty(receiver, royaltyFraction);
     }
+
+    /**
+     * @notice Allows contract owner to withdraw the key token from the contract.
+     */
+    function withdrawKeyToken(address receiver) external virtual onlyOwner {
+        keyContract.safeTransferFrom(address(this), receiver, keyId);
+    }
 }

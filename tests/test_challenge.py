@@ -1,7 +1,6 @@
-import brownie
 from pytest import fixture
 from scripts import deploy
-from brownie import FakeToken, accounts, convert
+from brownie import FakeToken, accounts, reverts, convert
 
 @fixture(scope="module", autouse=True)
 def challenge():
@@ -11,7 +10,7 @@ def challenge():
 def isolation(fn_isolation):
     pass
 
-def test_received_without_data(challenge):
+def test_received_with_no_data(challenge):
     key = FakeToken.at(challenge.keyContract())
     assert challenge.balance() == 30000000000000000
     operator_balance = accounts[1].balance()
@@ -44,8 +43,22 @@ def test_receive_eth(challenge):
     key.safeTransferFrom(accounts[0], challenge, challenge.keyId(), {"from": accounts[0]})
     assert accounts[0].balance() == operator_balance + 130000000000000000
     # now challenge contract must stop accepting funds
-    with brownie.reverts():
-        accounts[1].transfer(challenge, "0.1 ether")
+    with reverts(): accounts[1].transfer(challenge, "0.1 ether")
+
+def test_withdraw_key_token(challenge):
+    key = FakeToken.at(challenge.keyContract())
+    key.safeTransferFrom(accounts[0], challenge, challenge.keyId(), {"from": accounts[0]})
+    assert key.ownerOf(challenge.keyId()) == challenge
+    challenge.withdrawKeyToken(accounts[1])
+    assert key.ownerOf(challenge.keyId()) == accounts[1]
+
+def test_admin_permissions(challenge):
+    with reverts("Ownable: caller is not the owner"): challenge.setRoyalty(accounts[0], 2000, {"from": accounts[1]})
+    with reverts("Ownable: caller is not the owner"): challenge.withdrawKeyToken(accounts[0], {"from": accounts[1]})
+    challenge.transferOwnership(accounts[1], {"from": accounts[0]})
+    challenge.setRoyalty(accounts[0], 2000, {"from": accounts[1]})
+    assert challenge.royaltyInfo(1, 100) == (accounts[0], 20)
+
 
 def test_supports_interface(challenge):
     assert not challenge.supportsInterface("0x0000dEaD")
