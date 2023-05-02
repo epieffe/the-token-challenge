@@ -21,10 +21,6 @@ import "./utils/ERC2981Global.sol";
  */
 contract TokenChallenge is ERC721Single, ERC2981Global, Ownable, IERC721Receiver {
 
-    string private constant NAME = "Token Hacker Challenge";
-    string private constant SYMBOL = "THC";
-    string private constant TOKEN_URI = "ipfs://bafkreicul7b7wfiwkrfgtl7nruaebddnnejvphfmsy3ddleln6zaaeroia";
-
     /**
      * @notice The key token contract.
      */
@@ -36,9 +32,12 @@ contract TokenChallenge is ERC721Single, ERC2981Global, Ownable, IERC721Receiver
     uint256 public keyId;
 
     constructor(
+        string memory name,
+        string memory symbol,
+        string memory tokenURI,
         IERC721 _keyContract,
         uint256 _keyId
-    ) ERC721Single(NAME, SYMBOL, TOKEN_URI) {
+    ) ERC721Single(name, symbol, tokenURI) {
         keyContract = _keyContract;
         keyId = _keyId;
         // Set token royalty to 10%
