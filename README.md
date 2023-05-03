@@ -1,5 +1,9 @@
 # Token Hacker Challenge
-The *Token Hacker Challenge* smart contract, written in [Solidity](https://docs.soliditylang.org/).
+The *Token Hacker Challenge* smart contract.
+
+- [Etherscan](https://etherscan.io/address/0x3de4789307e9bf098b6b5d704d2c476e6ad307bf)
+- [OpenSea](https://opensea.io/assets/ethereum/0x3DE4789307e9BF098b6b5d704d2C476e6ad307bF/1)
+- Twitter: [@ferrariep](https://twitter.com/ferrariep)
 
 ## Description
 The *Token Hacker Challenge* consists of retrieving an [ERC-721](https://eips.ethereum.org/EIPS/eip-721) key token from an hacked wallet on [Ethereum](https://ethereum.org/). The hacked wallet private key is publicly available to anyone. The Token Hacker Challenge NFT is locked in its own contract and will be given to the challenge winner along with an ETH prize. The first one that withdraws the key token from the hacked wallet wins the challenge. The key token must be transfered to the Token Hacker Challenge contract using `safeTransferFrom` to unlock the Token Hacker Challenge NFT and all the Ethers in the Token Hacker Challenge contract. Beware that if you transfer assets to the hacked wallet you will probabily lose them.
